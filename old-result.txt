@@ -1,0 +1,106 @@
+<div className="bg-white text-gray-900 w-full max-w-screen-lg mx-auto p-4 shadow-lg rounded-lg">
+<div className="text-center text-xl font-bold mb-4">
+  ງວດປະຈຳວັນທີ່{" "}
+  {latestData.message ? (
+    <p>{latestData.message}</p>
+  ) : (
+    <p>{displayDate}</p>
+  )}
+</div>
+<div className="text-center text-[70px] font-bold mb-4">
+  {latestData && latestData.number5
+    ? latestData.number5
+    : "ລໍຖ້າຜົນການອອກລາງວັນ"}
+</div>
+<div className="text-center text-xl font-bold mb-4">
+  ເວລາປະກາດລາງວັນ 15:45
+</div>
+<div className="flex justify-center mt-5">
+  <table className="w-full max-w-xl border-collapse border border-gray-400 text-center mb-6">
+    <tbody>
+      <tr className="border border-gray-400">
+        <td className="p-2 border border-gray-400">ເລກ 5 ໂຕ</td>
+        <td className="p-2 border border-gray-400">
+          {latestData && latestData.number5
+            ? latestData.number5
+            : "ລໍຖ້າຜົນການອອກລາງວັນ"}
+        </td>
+      </tr>
+      <tr className="border border-gray-400">
+        <td className="p-2 border border-gray-400">ເລກ 4 ໂຕ</td>
+        <td className="p-2 border border-gray-400">
+          {latestData && latestData.number4
+            ? latestData.number4
+            : "ລໍຖ້າຜົນການອອກລາງວັນ"}
+        </td>
+      </tr>
+      <tr className="border border-gray-400">
+        <td className="p-2 border border-gray-400">ເລກ 3 ໂຕ</td>
+        <td className="p-2 border border-gray-400">
+          {latestData && latestData.number3
+            ? latestData.number3
+            : "ລໍຖ້າຜົນການອອກລາງວັນ"}
+        </td>
+      </tr>
+      <tr className="border border-gray-400">
+        <td className="p-2 border border-gray-400">ເລກ 2 ໂຕບົນ</td>
+        <td className="p-2 border border-gray-400">
+          {latestData && latestData.number2top
+            ? latestData.number2top
+            : "ລໍຖ້າຜົນການອອກລາງວັນ"}
+        </td>
+      </tr>
+      <tr className="border border-gray-400">
+        <td className="p-2 border border-gray-400">ເລກ 2 ໂຕລ່າງ</td>
+        <td className="p-2 border border-gray-400">
+          {latestData && latestData.number2
+            ? latestData.number2
+            : "ລໍຖ້າຜົນການອອກລາງວັນ"}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+</div>
+
+
+history 
+ <div className="bg-white text-gray-900 w-full max-w-screen-lg mx-auto p-4 shadow-lg rounded-lg">
+      <h2 className="text-center text-2xl font-bold mb-4">ຜົນການອອກເລກລາງວັນ</h2>
+      <div className="overflow-x-auto">
+        <table className="min-w-full border-collapse border border-gray-400 text-center table-fixed">
+          <thead>
+            <tr className="border border-gray-400">
+              <th className="p-2 border border-gray-400">ວັນທີ</th>
+              <th className="p-2 border border-gray-400">ເລກ 5 ໂຕ</th>
+              <th className="p-2 border border-gray-400">ເລກ 4 ໂຕ</th>
+              <th className="p-2 border border-gray-400">ເລກ 3 ໂຕ</th>
+              <th className="p-2 border border-gray-400">ເລກ 2 ໂຕເທິ່ງ</th>
+              <th className="p-2 border border-gray-400">ເລກ 2 ໂຕລຸ່ມ</th>
+            </tr>
+          </thead>
+          <tbody>
+            {results.length > 0 ? (
+              results.map((result) => (
+                <tr key={result.id} className="border border-gray-400">
+                  <td className="p-2 border border-gray-400">{formatDate(new Date(result.date), timeZone)}</td>
+                  <td className="p-2 border border-gray-400">{result.number5}</td>
+                  <td className="p-2 border border-gray-400">{result.number4}</td>
+                  <td className="p-2 border border-gray-400">{result.number3}</td>
+                  <td className="p-2 border border-gray-400">{result.number2top}</td>
+                  <td className="p-2 border border-gray-400">{result.number2}</td>
+                </tr>
+              ))
+            ) : (
+              <tr className="border border-gray-400">
+                <td className="p-2 border border-gray-400" colSpan={6}>
+                  ລໍຖ້າຜົນການອອກລາງວັນ
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    min-w-full border border-collapse border-gray-400 text-center table-fixed
