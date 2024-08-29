@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import * as jose from 'jose'
+import bcrypt from 'bcrypt'
+import { cookies } from 'next/headers'
 
 // GET
 export async function GET(
@@ -35,6 +38,8 @@ export async function POST(
 
   if (route === 'numbers') {
     return addNumbers(request);
+  } else if (route === 'signin') {
+    return signin(request);
   }
 
   return NextResponse.json({ route });
@@ -106,3 +111,54 @@ async function addNumbers(req: NextRequest) {
     return NextResponse.json({ error: error.message, success: false });
   }
 }
+
+async function signin(req: NextRequest) {
+
+  const { username, password } = await req.json();
+  if (username && password) {
+    const user = await prisma.user.findFirst({
+      where: {
+        username,
+      },
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: 'ไม่พบผู้ใช้' });
+    }
+
+    const isValid = await bcrypt.compare(password, user.password);
+    if (!isValid) {
+      return NextResponse.json({ error: 'รหัสผ่านไม่ถูกต้อง' });
+    }
+
+// create jwt token
+const secret = new TextEncoder().encode(process.env.NEXT_PUBLIC_SECRET_TOKEN);
+const alg = "HS256";
+const jwt = await new jose.SignJWT({
+  username: user.username,
+})
+  .setProtectedHeader({ alg })
+  .setExpirationTime("350h")
+  .setSubject(user.id.toString())
+  .sign(secret);
+
+    return NextResponse.json({ success: true, token: jwt });
+  }
+}
+
+// async function signup(req: NextRequest) {
+
+//   const { username, password } = await req.json();
+//   if (username && password) {
+
+//     const hashedPassword = await bcrypt.hash(password, 10);
+
+//     await prisma.user.create({
+//       data: {
+//         username,
+//         password: hashedPassword
+//       },
+//     });
+//     return NextResponse.json({ success: true });
+//   }
+// }
