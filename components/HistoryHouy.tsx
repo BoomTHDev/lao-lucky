@@ -32,8 +32,8 @@ export default function HistoryHouy({ }: Props) {
         if (now.isAfter(targetTime)) {
             try {
                 const result = await getHistoryNumbers()
-                if (result.result) {
-                    setNumbers(result.result)
+                if (result.numbers) {
+                    setNumbers(result.numbers)
                 }
             } catch (error: any) {
                 setError("An error occurred while fetching the number.")

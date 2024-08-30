@@ -36,7 +36,7 @@ export default function LastHouy({ }: Props) {
                 setIsLoading(true)
                 const result = await getLastNumbers()
                 if (result.success) {
-                    setNumbers(result.number)
+                    setNumbers(result.numbers)
                 } else {
                     setError("Failed to fetch the number.")
                 }

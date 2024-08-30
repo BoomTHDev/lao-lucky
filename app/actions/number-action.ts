@@ -7,7 +7,7 @@ import moment from 'moment-timezone'
 export async function getMainNumber() {
   try {
     const response = await prisma.result.findFirst({});
-    return { number: response?.number5, success: true }
+    return { result: response?.number5, success: true }
   } catch (error: any) {
     console.log(error);
     return { error: error.message, success: false }

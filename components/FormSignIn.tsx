@@ -25,7 +25,7 @@ export default function FormSignIn({ }: Props) {
                     Swal.fire({
                         icon: 'error',
                         title: 'ผิดพลาด',
-                        text: result?.message,
+                        text: result?.error,
                     })
                 }
                 ref.current?.reset()

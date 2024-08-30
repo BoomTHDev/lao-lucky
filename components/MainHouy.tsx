@@ -39,7 +39,7 @@ export default function MainHouy({ }: Props) {
                 setIsLoading(true)
                 const result = await getMainNumber()
                 if (result.success) {
-                    setNumber(result.number)
+                    setNumber(result.result)
                 } else {
                     setError("Failed to fetch the number.")
                 }
