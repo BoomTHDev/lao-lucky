@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "dotenv -e .env.development -- bunx prisma db push && bunx prisma generate && next dev",
     "build": "next build",
-    "start": "dotenv -e .env.production -- bunx prisma db push && bunx prisma generate && next start",
+    "start": "bunx prisma db push && bunx prisma generate && next start",
     "lint": "next lint"
   },
   "dependencies": {
