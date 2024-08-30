@@ -2,6 +2,7 @@
 import React, { useRef } from 'react'
 import { addNumber } from '../app/actions/number-action'
 import Swal from 'sweetalert2'
+import Link from 'next/link'
 
 type Props = {}
 
@@ -51,6 +52,9 @@ export default function FormUpdateNumber({ }: Props) {
             <button type="submit" className="w-full py-2 border border-gray-600 bg-inherit hover:bg-gray-600 hover:text-gray-50 rounded-lg font-semibold text-lg mt-4 transition duration-200">
                 บันทึกการเปลี่ยนแปลง
             </button>
+            <div>
+                <Link href='/' className='text-md hover:underline'>กลับไปหน้าหลัก</Link>
+            </div>
         </form>
     )
 }
