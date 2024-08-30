@@ -15,7 +15,7 @@ export default function FormSignIn({ }: Props) {
             ref={ref}
             action={async (formData: FormData) => {
                 const result = await signin(formData)
-                if (result.success) {
+                if (result?.success) {
                     Swal.fire({
                         icon: 'success',
                         title: 'สำเร็จ',
