@@ -1,13 +1,27 @@
 'use server'
 
-import axios from 'axios'
 import { prisma } from '@/lib/prisma'
 import moment from 'moment-timezone'
 
 export async function getMainNumber() {
   try {
-    const response = await prisma.result.findFirst({});
-    return { result: response?.number5, success: true }
+    const response = await prisma.result.findFirst({
+      orderBy: { Date: "desc" }
+    });
+    return { result: response, success: true }
+  } catch (error: any) {
+    console.log(error);
+    return { error: error.message, success: false }
+  }
+}
+
+export async function getPrevMainNumber() {
+  try {
+    const response = await prisma.result.findFirst({
+      orderBy: { Date: "desc" },
+      skip: 1
+    })
+    return { result: response, success: true }
   } catch (error: any) {
     console.log(error);
     return { error: error.message, success: false }
@@ -16,7 +30,22 @@ export async function getMainNumber() {
 
 export async function getLastNumbers() {
   try {
-    const response = await prisma.result.findFirst({});
+    const response = await prisma.result.findFirst({
+      orderBy: { Date: "desc" },
+    });
+    return { numbers: response, success: true }
+  } catch (error: any) {
+    console.log(error);
+    return { error: error.message, success: false }
+  }
+}
+
+export async function getPrevLastNumbers() {
+  try {
+    const response = await prisma.result.findFirst({
+      orderBy: { Date: "desc" },
+      skip: 1
+    })
     return { numbers: response, success: true }
   } catch (error: any) {
     console.log(error);
@@ -30,6 +59,20 @@ export async function getHistoryNumbers() {
       take: 14,
       orderBy: { Date: "desc" },
     });
+    return { numbers: response, success: true }
+  } catch (error: any) {
+    console.log(error);
+    return { error: error.message, success: false }
+  }
+}
+
+export async function getPrevHistoryNumbers() {
+  try {
+    const response = await prisma.result.findMany({
+      orderBy: { Date: "desc" },
+      take: 14,
+      skip: 1
+    })
     return { numbers: response, success: true }
   } catch (error: any) {
     console.log(error);

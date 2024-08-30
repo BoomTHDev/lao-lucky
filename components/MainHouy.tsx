@@ -1,10 +1,8 @@
-// @ts-nocheck
+"use client"
 
-'use client'
-
-import { getMainNumber } from '@/app/actions/number-action'
+import { getMainNumber, getPrevMainNumber } from '@/app/actions/number-action'
 import { useMainNumber } from '@/lib/store/main-number'
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import dayjs from 'dayjs'
 
 type Props = {}
@@ -33,23 +31,26 @@ export default function MainHouy({ }: Props) {
     const fetchNumber = async () => {
         const now = dayjs();
         const targetTime = dayjs().hour(15).minute(44).second(0);
+        const midnight = dayjs().hour(0).minute(0).second(0);
+    
+        try {
+            setIsLoading(true);
 
-        if (now.isAfter(targetTime)) {
-            try {
-                setIsLoading(true)
-                const result = await getMainNumber()
-                if (result.success) {
-                    setNumber(result.result)
-                } else {
-                    setError("Failed to fetch the number.")
-                }
-            } catch (error) {
-                setError("An error occurred while fetching the number.")
-            } finally {
-                setIsLoading(false)
+            const result = await getMainNumber()
+            const result2 = await getPrevMainNumber()
+            
+            if (now.isSame(midnight) || now.isAfter(midnight)) {
+                setNumber(result2.result?.number5 as any)
+            } else if (now.isAfter(targetTime)) {
+                setNumber(result.result?.number5 as any)
             }
+            
+        } catch (error) {
+            setError("An error occurred while fetching the number.");
+        } finally {
+            setIsLoading(false);
         }
-    }
+    };
 
     return (
         <div className='flex flex-col gap-2'>

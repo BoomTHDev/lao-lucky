@@ -3,7 +3,7 @@
 'use client'
 
 import React, { useEffect } from 'react'
-import { getLastNumbers } from '@/app/actions/number-action'
+import { getLastNumbers, getPrevLastNumbers } from '@/app/actions/number-action'
 import { useLastNumber } from '@/lib/store/last-number'
 import dayjs from 'dayjs'
 
@@ -31,22 +31,26 @@ export default function LastHouy({ }: Props) {
     const fetchNumbers = async () => {
         const now = dayjs();
         const targetTime = dayjs().hour(15).minute(44).second(0);
-        if (now.isAfter(targetTime)) {
-            try {
-                setIsLoading(true)
-                const result = await getLastNumbers()
-                if (result.success) {
-                    setNumbers(result.numbers)
-                } else {
-                    setError("Failed to fetch the number.")
-                }
-            } catch (error) {
-                setError("An error occurred while fetching the number.")
-            } finally {
-                setIsLoading(false)
+        const midnight = dayjs().hour(0).minute(0).second(0);
+    
+        try {
+            setIsLoading(true);
+
+            const result = await getLastNumbers()
+            const result2 = await getPrevLastNumbers()
+            
+            if (now.isSame(midnight) || now.isAfter(midnight)) {
+                setNumbers(result2.numbers as any)
+            } else if (now.isAfter(targetTime)) {
+                setNumbers(result.numbers as any)
             }
+            
+        } catch (error) {
+            setError("An error occurred while fetching the number.");
+        } finally {
+            setIsLoading(false);
         }
-    }
+    };
 
     return (
         <div className='grid grid-cols-2 border-2 border-gray-400'>

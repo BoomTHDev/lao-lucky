@@ -1,7 +1,7 @@
 'use client'
 import React, { useEffect } from 'react'
 import { useHistoryNumber } from '@/lib/store/history-number'
-import { getHistoryNumbers } from '@/app/actions/number-action'
+import { getHistoryNumbers, getPrevHistoryNumbers } from '@/app/actions/number-action'
 import dayjs from 'dayjs'
 
 type Props = {}
@@ -25,23 +25,31 @@ export default function HistoryHouy({ }: Props) {
         // Clear interval เมื่อ component ถูก unmount
         return () => clearInterval(intervalId);
     }, [setNumbers, setError, setIsLoading])
-
     const fetchNumbers = async () => {
         const now = dayjs();
         const targetTime = dayjs().hour(15).minute(44).second(0);
-        if (now.isAfter(targetTime)) {
-            try {
-                const result = await getHistoryNumbers()
-                if (result.numbers) {
-                    setNumbers(result.numbers)
-                }
-            } catch (error: any) {
-                setError("An error occurred while fetching the number.")
-            } finally {
-                setIsLoading(false)
+        const midnight = dayjs().hour(0).minute(0).second(0);
+    
+        try {
+            setIsLoading(true);
+
+            const result = await getHistoryNumbers()
+            console.log('result', result)
+            const result2 = await getPrevHistoryNumbers()
+            console.log('result2', result2)
+            
+            if (now.isSame(midnight) || now.isAfter(midnight)) {
+                setNumbers(result2.numbers as any)
+            } else if (now.isAfter(targetTime)) {
+                setNumbers(result.numbers as any)
             }
+            
+        } catch (error) {
+            setError("An error occurred while fetching the number.");
+        } finally {
+            setIsLoading(false);
         }
-    }
+    };
 
     return (
         <div className='flex flex-col gap-2'>
