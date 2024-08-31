@@ -1,19 +1,18 @@
 "use client"
 
 import { getMainNumber, getPrevMainNumber } from '@/app/actions/number-action'
-import { useMainNumber } from '@/lib/store/main-number'
+import { errorState, loadingState, numberState } from '@/lib/store/numbers'
 import React, { useEffect } from 'react'
 import dayjs from 'dayjs'
+import { useRecoilState } from 'recoil'
 
 type Props = {}
 
 export default function MainHouy({ }: Props) {
-    const number = useMainNumber((state) => state.number)
-    const isLoading = useMainNumber((state) => state.isLoading)
-    const error = useMainNumber((state) => state.error)
-    const setNumber = useMainNumber((state) => state.setNumber)
-    const setIsLoading = useMainNumber((state) => state.setIsLoading)
-    const setError = useMainNumber((state) => state.setError)
+
+    const [number, setNumber] = useRecoilState(numberState)
+    const [loading, setLoading] = useRecoilState(loadingState)
+    const [error, setError] = useRecoilState(errorState)
 
     const todayNow = dayjs().format('DD/MM/YYYY')
 
@@ -26,44 +25,47 @@ export default function MainHouy({ }: Props) {
 
         // Clear interval เมื่อ component ถูก unmount
         return () => clearInterval(intervalId);
-    }, [setNumber, setIsLoading, setError])
+    }, [setNumber, setLoading, setError])
 
     const fetchNumber = async () => {
         const now = dayjs();
-        const targetTime = dayjs().hour(15).minute(44).second(0);
-        const midnight = dayjs().hour(0).minute(0).second(0);
-    
+        const targetTime = dayjs().hour(15).minute(45).second(0);
+        const midnight = dayjs().endOf('day');
+        
         try {
-            setIsLoading(true);
-
-            const result = await getMainNumber()
-            const result2 = await getPrevMainNumber()
+            setLoading(true);
+    
+            const result = await getMainNumber();
+            const result2 = await getPrevMainNumber();
             
-            if (now.isSame(midnight) || now.isAfter(midnight)) {
-                setNumber(result2.result?.number5 as any)
-            } else if (now.isAfter(targetTime)) {
-                setNumber(result.result?.number5 as any)
+            if (now.isBefore(targetTime)) {
+                // ถ้าเวลาก่อน 15:45 ให้แสดงผลลัพธ์ของเมื่อวาน
+                setNumber(result2.result as any);
+            } else {
+                // ถ้าเวลาอยู่ระหว่าง 15:45 ถึงเที่ยงคืน ให้แสดงผลลัพธ์ของวันนี้
+                setNumber(result.result as any);
             }
             
         } catch (error) {
             setError("An error occurred while fetching the number.");
         } finally {
-            setIsLoading(false);
+            setLoading(false);
         }
     };
+    
 
     return (
         <div className='flex flex-col gap-2'>
             <div className='font-bold text-lg'>ງວດປະຈຳວັນທີ່ {todayNow}</div>
             <h1 className='text-7xl font-bold'>
-                {isLoading ? (
+                {loading ? (
                     <div className='flex justify-center'>
                         <div className='animate-spin rounded-full h-20 w-20 border-b-2 border-gray-900'></div>
                     </div>
                 ) : error ? (
                     <div className='text-red-500'>{error}</div>
                 ) : (
-                    number
+                    <div>{number.number5}</div>
                 )}
             </h1>
             <div className='text-md'>ອອກຜົນລາງວັນ 15:45</div>

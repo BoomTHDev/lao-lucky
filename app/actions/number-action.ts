@@ -28,37 +28,13 @@ export async function getPrevMainNumber() {
   }
 }
 
-export async function getLastNumbers() {
-  try {
-    const response = await prisma.result.findFirst({
-      orderBy: { Date: "desc" },
-    });
-    return { numbers: response, success: true }
-  } catch (error: any) {
-    console.log(error);
-    return { error: error.message, success: false }
-  }
-}
-
-export async function getPrevLastNumbers() {
-  try {
-    const response = await prisma.result.findFirst({
-      orderBy: { Date: "desc" },
-      skip: 1
-    })
-    return { numbers: response, success: true }
-  } catch (error: any) {
-    console.log(error);
-    return { error: error.message, success: false }
-  }
-}
-
 export async function getHistoryNumbers() {
   try {
     const response = await prisma.result.findMany({
       take: 14,
       orderBy: { Date: "desc" },
     });
+    console.log(response)
     return { numbers: response, success: true }
   } catch (error: any) {
     console.log(error);

@@ -1,18 +1,18 @@
 'use client'
 import React, { useEffect } from 'react'
-import { useHistoryNumber } from '@/lib/store/history-number'
 import { getHistoryNumbers, getPrevHistoryNumbers } from '@/app/actions/number-action'
 import dayjs from 'dayjs'
+import { useRecoilState } from 'recoil'
+import { loadingState, errorState, numbersState } from '@/lib/store/numbers'
 
 type Props = {}
 
 export default function HistoryHouy({ }: Props) {
-    const numbers = useHistoryNumber((state) => state.numbers)
-    const isLoading = useHistoryNumber((state) => state.isLoading)
-    const error = useHistoryNumber((state) => state.error)
-    const setNumbers = useHistoryNumber((state) => state.setNumbers)
-    const setIsLoading = useHistoryNumber((state) => state.setIsLoading)
-    const setError = useHistoryNumber((state) => state.setError)
+
+    const [numbers, setNumbers] = useRecoilState(numbersState)
+    const [loading, setLoading] = useRecoilState(loadingState)
+    const [error, setError] = useRecoilState(errorState)
+
 
     useEffect(() => {
 
@@ -24,30 +24,33 @@ export default function HistoryHouy({ }: Props) {
 
         // Clear interval เมื่อ component ถูก unmount
         return () => clearInterval(intervalId);
-    }, [setNumbers, setError, setIsLoading])
+    }, [setNumbers, setError, setLoading])
     const fetchNumbers = async () => {
         const now = dayjs();
         const targetTime = dayjs().hour(15).minute(44).second(0);
-        const midnight = dayjs().hour(0).minute(0).second(0);
+        const midnight = dayjs().endOf('day');
     
         try {
-            setIsLoading(true);
+            setLoading(true);
 
             const result = await getHistoryNumbers()
             console.log('result', result)
             const result2 = await getPrevHistoryNumbers()
             console.log('result2', result2)
-            
-            if (now.isSame(midnight) || now.isAfter(midnight)) {
-                setNumbers(result2.numbers as any)
-            } else if (now.isAfter(targetTime)) {
-                setNumbers(result.numbers as any)
+
+            if (now.isBefore(targetTime)) {
+                // ถ้าเวลาก่อน 15:45 ให้แสดงผลลัพธ์ของเมื่อวาน
+                setNumbers(result2.numbers as any);
+            } else {
+                // ถ้าเวลาอยู่ระหว่าง 15:45 ถึงเที่ยงคืน ให้แสดงผลลัพธ์ของวันนี้
+                setNumbers(result.numbers as any);
             }
+            
             
         } catch (error) {
             setError("An error occurred while fetching the number.");
         } finally {
-            setIsLoading(false);
+            setLoading(false);
         }
     };
 
@@ -67,23 +70,25 @@ export default function HistoryHouy({ }: Props) {
                     </tr>
                 </thead>
                 <tbody>
-                    {isLoading ? (
+                    {loading ? (
                         <tr>
                             <td colSpan={6} className='border border-gray-400 p-2 text-center'>
                                 กำลังโหลดข้อมูล...
                             </td>
                         </tr>
                     ) : (
-                        numbers.map((item, index) => (
-                            <tr key={index}>
-                                <td className='border border-gray-400 p-2'>{dayjs(item.Date).format('DD/MM/YYYY')}</td>
-                                <td className='border border-gray-400 p-2'>{item.number5}</td>
-                                <td className='border border-gray-400 p-2'>{item.number4}</td>
-                                <td className='border border-gray-400 p-2'>{item.number3}</td>
-                                <td className='border border-gray-400 p-2'>{item.number2top}</td>
-                                <td className='border border-gray-400 p-2'>{item.number2}</td>
-                            </tr>
-                        ))
+                        numbers.map((number, index) => {
+                            return (
+                                <tr key={index}>
+                                    <td className='border border-gray-400 p-2'>{dayjs(number.Date).format('DD/MM/YYYY')}</td>
+                                    <td className='border border-gray-400 p-2'>{number.number5}</td>
+                                    <td className='border border-gray-400 p-2'>{number.number4}</td>
+                                    <td className='border border-gray-400 p-2'>{number.number3}</td>
+                                    <td className='border border-gray-400 p-2'>{number.number2top}</td>
+                                    <td className='border border-gray-400 p-2'>{number.number2}</td>
+                                </tr>
+                            )
+                        })
                     )}
                 </tbody>
             </table>

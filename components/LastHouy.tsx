@@ -1,21 +1,17 @@
-// @ts-nocheck
-
 'use client'
 
 import React, { useEffect } from 'react'
-import { getLastNumbers, getPrevLastNumbers } from '@/app/actions/number-action'
-import { useLastNumber } from '@/lib/store/last-number'
 import dayjs from 'dayjs'
+import { getMainNumber, getPrevMainNumber } from '@/app/actions/number-action'
+import { useRecoilState } from 'recoil'
+import { numberState, loadingState, errorState } from '@/lib/store/numbers'
 
 type Props = {}
 
 export default function LastHouy({ }: Props) {
-    const numbers = useLastNumber((state) => state.numbers)
-    const isLoading = useLastNumber((state) => state.isLoading)
-    const error = useLastNumber((state) => state.error)
-    const setNumbers = useLastNumber((state) => state.setNumbers)
-    const setIsLoading = useLastNumber((state) => state.setIsLoading)
-    const setError = useLastNumber((state) => state.setError)
+    const [numbers, setNumbers] = useRecoilState(numberState)
+    const [loading, setLoading] = useRecoilState(loadingState)
+    const [error, setError] = useRecoilState(errorState)
 
     useEffect(() => {
         // เรียก fetchNumber ทันทีที่ component ถูก mount เพื่อแสดงข้อมูลเก่า
@@ -26,29 +22,31 @@ export default function LastHouy({ }: Props) {
 
         // Clear interval เมื่อ component ถูก unmount
         return () => clearInterval(intervalId);
-    }, [setNumbers, setIsLoading, setError])
+    }, [setNumbers, setLoading, setError])
 
     const fetchNumbers = async () => {
         const now = dayjs();
-        const targetTime = dayjs().hour(15).minute(44).second(0);
-        const midnight = dayjs().hour(0).minute(0).second(0);
-    
+        const targetTime = dayjs().hour(15).minute(45).second(0);
+        const midnight = dayjs().endOf('day');
+        
         try {
-            setIsLoading(true);
-
-            const result = await getLastNumbers()
-            const result2 = await getPrevLastNumbers()
+            setLoading(true);
+    
+            const result = await getMainNumber();
+            const result2 = await getPrevMainNumber();
             
-            if (now.isSame(midnight) || now.isAfter(midnight)) {
-                setNumbers(result2.numbers as any)
-            } else if (now.isAfter(targetTime)) {
-                setNumbers(result.numbers as any)
+            if (now.isBefore(targetTime)) {
+                // ถ้าเวลาก่อน 15:45 ให้แสดงผลลัพธ์ของเมื่อวาน
+                setNumbers(result2.result as any);
+            } else {
+                // ถ้าเวลาอยู่ระหว่าง 15:45 ถึงเที่ยงคืน ให้แสดงผลลัพธ์ของวันนี้
+                setNumbers(result.result as any);
             }
             
         } catch (error) {
             setError("An error occurred while fetching the number.");
         } finally {
-            setIsLoading(false);
+            setLoading(false);
         }
     };
 
@@ -59,7 +57,7 @@ export default function LastHouy({ }: Props) {
             </div>
             <div className='border-b-2 border-gray-400 h-10 flex justify-center items-center'>
 
-                {isLoading ? (
+                {loading ? (
                     <div className='flex justify-center'>
                         <span>กำลังโหลดข้อมูล...</span>
                     </div>
@@ -73,7 +71,7 @@ export default function LastHouy({ }: Props) {
                 <span>ເລກ 4 ໂຕ</span>
             </div>
             <div className='border-b-2 border-gray-400 h-10 flex justify-center items-center'>
-                {isLoading ? (
+                {loading ? (
                     <div className='flex justify-center'>
                         <span>กำลังโหลดข้อมูล...</span>
                     </div>
@@ -87,7 +85,7 @@ export default function LastHouy({ }: Props) {
                 <span>ເລກ 3 ໂຕ</span>
             </div>
             <div className='border-b-2 border-gray-400 h-10 flex justify-center items-center'>
-                {isLoading ? (
+                {loading ? (
                     <div className='flex justify-center'>
                         <span>กำลังโหลดข้อมูล...</span>
                     </div>
@@ -102,7 +100,7 @@ export default function LastHouy({ }: Props) {
                 <span>2 ໂຕບົນ</span>
             </div>
             <div className='border-b-2 border-gray-400 h-10 flex justify-center items-center'>
-                {isLoading ? (
+                {loading ? (
                     <div className='flex justify-center'>
                         <span>กำลังโหลดข้อมูล...</span>
                     </div>
@@ -116,7 +114,7 @@ export default function LastHouy({ }: Props) {
                 <span>ເລກ 2 ໂຕລ່າງ</span>
             </div>
             <div className='h-10 flex justify-center items-center'>
-                {isLoading ? (
+                {loading ? (
                     <div className='flex justify-center'>
                         <span>กำลังโหลดข้อมูล...</span>
                     </div>

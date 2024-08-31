@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "dotenv -e .env.development -- bunx prisma db push && bunx prisma generate && next dev",
-    "build": "next build",
-    "start": "bunx prisma db push && bunx prisma generate && next start",
+    "build": "dotenv -e .env.production -- bunx prisma db push && bunx prisma generate && next build",
+    "start": "dotenv -e .env.production -- bunx prisma db push && bunx prisma generate && next start",
     "lint": "next lint"
   },
   "dependencies": {
@@ -23,10 +23,10 @@
     "next-themes": "^0.3.0",
     "react": "^18",
     "react-dom": "^18",
+    "recoil": "^0.7.7",
     "sweetalert2": "^11.12.4",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",
-    "zustand": "^4.5.5"
   },
   "devDependencies": {
     "@types/node": "^20",
