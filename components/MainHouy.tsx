@@ -14,7 +14,8 @@ export default function MainHouy({ }: Props) {
     const [loading, setLoading] = useRecoilState(loadingState)
     const [error, setError] = useRecoilState(errorState)
 
-    const todayNow = dayjs().format('DD/MM/YYYY')
+    const now = dayjs();
+    const targetTime = dayjs().hour(15).minute(45).second(0);
 
     useEffect(() => {
         // เรียก fetchNumber ทันทีที่ component ถูก mount เพื่อแสดงข้อมูลเก่า
@@ -31,13 +32,13 @@ export default function MainHouy({ }: Props) {
         const now = dayjs();
         const targetTime = dayjs().hour(15).minute(45).second(0);
         const midnight = dayjs().endOf('day');
-        
+
         try {
             setLoading(true);
-    
+
             const result = await getMainNumber();
             const result2 = await getPrevMainNumber();
-            
+
             if (now.isBefore(targetTime)) {
                 // ถ้าเวลาก่อน 15:45 ให้แสดงผลลัพธ์ของเมื่อวาน
                 setNumber(result2.result as any);
@@ -45,18 +46,18 @@ export default function MainHouy({ }: Props) {
                 // ถ้าเวลาอยู่ระหว่าง 15:45 ถึงเที่ยงคืน ให้แสดงผลลัพธ์ของวันนี้
                 setNumber(result.result as any);
             }
-            
+
         } catch (error) {
             setError("An error occurred while fetching the number.");
         } finally {
             setLoading(false);
         }
     };
-    
+
 
     return (
         <div className='flex flex-col gap-2'>
-            <div className='font-bold text-lg'>ງວດປະຈຳວັນທີ່ {todayNow}</div>
+            <div className='font-bold text-lg'>ງວດປະຈຳວັນທີ່ {now.isBefore(targetTime) ? dayjs(number.Date).format("DD/MM/YYYY") : dayjs().format("DD/MM/YYYY")}</div>
             <h1 className='text-7xl font-bold'>
                 {loading ? (
                     <div className='flex justify-center'>
